@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mellonry0.1</title>
+    <style>.texto{word-break: break-all};</style>
+    <script type="module">
+        import { GoogleGenerativeAI } from 'https://esm.run/@google/generative-ai';
+
+        const apiKey = 'AIzaSyCi4zM2veX0a9_RzTbGj__CUdHWSIzTK9o'; // Substitua pelo seu API Key real
+        const genAI = new GoogleGenerativeAI(apiKey);
+        
+        const model = genAI.getGenerativeModel({
+            model: "gemini-1.5-pro",
+            systemInstruction: "Você é Mellonry, um site que é como um diario virtual. Funciona assim, o usuario digita algo que aconteceu na vida dele, ele vai citar pessoas, o que aconteceu com elas e como ele se sente, como essas informações separe de forma breve as seguintes infomrações: Personagens (o usuario n é um personagem!), Relacionamento entre os personagens (Amigo, irmao, mae...), Os sentimentos do personagens possivelmente (de forma breve, sem explicações), defina a perda ou ganha dos pontos de relacionamentos(cada personagem pode ter de -100 a 100 pontos, isso é definido como vc quiser, por exemplo: Eu odeio meu irmao, logo sera -50, eu amo a minha mãe 100) e por fim um conselho sobe a situação do usuario. você tem que ser como um amigo proximo do usuario, o nome 'mellonry' vem do elfo (tolkien) para 'amigo' entao haja como um elfo de tolkien e tambem como um amigo, tambem tome como refernecia o 'puck' de Berserk. Para melhor funcionamento o texto saido será apenas o resultado, sem introdução, sem um personagem tiver algum vinculo, escreva por exemplo: Ori-Pai, Felipe-Irmão"
+        });
+
+        
+        const generationConfig = {
+            temperature: 1,
+            topP: 0.95,
+            topK: 64,
+            maxOutputTokens: 8192,
+            responseMimeType: "text/plain",
+        };
+
+        async function sendMessage() {
+            const userInput = document.getElementById('userInput').value;
+            const chatSession = model.startChat({
+                generationConfig,
+                history: [
+                    {
+                        role: "user",
+                        parts: [{ text: userInput }],
+                    }
+                ],
+            });
+
+            const result = await chatSession.sendMessage(userInput);
+            console.log(result.response.text());
+            document.getElementById('response').innerText = result.response.text();
+        }
+
+        // Adiciona o evento de clique ao botão assim que o módulo é carregado
+        window.addEventListener('DOMContentLoaded', () => {
+            document.getElementById('sendButton').addEventListener('click', sendMessage);
+        });
+    </script>
+       
+</head>
+<body>
+    <h1>Mellonry0.1</h1>
+    <textarea id="userInput" rows="4" cols="50" placeholder="Digite sua mensagem aqui..."></textarea><br>
+    <button id="sendButton">Enviar</button>
+    <h2>Resposta:</h2>
+    <pre class="texto" id="response"></pre>
+</body>
+</html>
